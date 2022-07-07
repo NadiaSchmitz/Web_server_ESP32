@@ -5,27 +5,31 @@
   copies or substantial portions of the Software.
 *********/
 
-// Import required libraries
+// Import 
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <LiquidCrystal_I2C.h>
 
-// Replace with your network credentials
+// Wi-Fi
 const char* ssid = "FRITZ!Box 7490";
 const char* password = "13102413714620774693";
+
 
 const char* PARAM_INPUT_1 = "output";
 const char* PARAM_INPUT_2 = "state";
 
+// Augen
 int weis_1 = 26;
 int weis_2 = 27;
 
+// LCD
 LiquidCrystal_I2C lcd(0x27,16,2);
 
-// Create AsyncWebServer object on port 80
+// AsyncWebServer objekt - port 80
 AsyncWebServer server(80);
 
+// Webseite erstellen
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
@@ -61,7 +65,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 </html>
 )rawliteral";
 
-// Replaces placeholder with button section in your web page
+// Schalter erstellen
 String processor(const String& var){
   //Serial.println(var);
   if(var == "BUTTONPLACEHOLDER"){
@@ -84,9 +88,10 @@ String outputState(int output){
 }
 
 void setup(){
-  // Serial port for debugging purposes
+  // Serial starten
   Serial.begin(115200);
 
+  // LED-Modus definieren
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
   pinMode(5, OUTPUT);
@@ -95,37 +100,36 @@ void setup(){
   digitalWrite(12, LOW);
   pinMode(14, OUTPUT);
   digitalWrite(14, LOW);
-
   pinMode(weis_1, OUTPUT);
   digitalWrite(weis_1, HIGH);
   pinMode(weis_2, OUTPUT);
   digitalWrite(weis_2, HIGH);
 
+  // LCD Monitor starten
   lcd.init();   
   lcd.backlight();
-
   
-  
-  // Connect to Wi-Fi
+  // Wi-Fi Verbindung
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi..");
   }
 
-  // Print ESP Local IP Address
+  // ESP Local IP Addresse ausdrucken
   Serial.println(WiFi.localIP());
 
-  // Route for root / web page
+  // Routing an die Webseite
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
   });
 
-  // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
-  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  // Senden GET-Request an <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
+    server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String inputMessage1;
     String inputMessage2;
-    // GET input1 value on <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
+    
+  // GET input1 value on <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
     if (request->hasParam(PARAM_INPUT_1) && request->hasParam(PARAM_INPUT_2)) {
       inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
       inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
@@ -135,7 +139,7 @@ void setup(){
       inputMessage1 = "No message sent";
       inputMessage2 = "No message sent";
     }
-    Serial.print("GPIO: ");
+    Serial.print("PIN: ");
     Serial.print(inputMessage1);
     Serial.print(" - Set to: ");
     Serial.println(inputMessage2);
@@ -153,46 +157,42 @@ void loop() {
       lcd.println("HALLO!             ");
       lcd.setCursor(0,1);
       lcd.println("                      ");
-  delay(3000);
-  
-      } else {
-        lcd.setCursor(0,0);
-  lcd.println("                          ");
-  lcd.setCursor(0,1);
-  lcd.println("                               ");
-  delay(1000);
-        }
+      delay(3000);
+    } else {
+      lcd.setCursor(0,0);
+      lcd.println("                          ");
+      lcd.setCursor(0,1);
+      lcd.println("                               ");
+      delay(1000);
+    }
 
-int liebe = digitalRead(5);
-if(liebe) {
-    lcd.setCursor(0,0);
+    int liebe = digitalRead(5);
+    if(liebe) {
+      lcd.setCursor(0,0);
       lcd.println("LIEBE                   ");
       lcd.setCursor(0,1);
       lcd.println("                            ");
       delay(3000);
-      
     } else {
       lcd.setCursor(0,0);
-  lcd.println("                          ");
-  lcd.setCursor(0,1);
-  lcd.println("                               ");
-  delay(1000);
+      lcd.println("                          ");
+      lcd.setCursor(0,1);
+      lcd.println("                               ");
+      delay(1000);
     }
 
-        int laune = digitalRead(12);
-  if(laune) {
-    lcd.setCursor(0,0);
+    int laune = digitalRead(12);
+    if(laune) {
+      lcd.setCursor(0,0);
       lcd.println("WIR SEHEN UNS   ");
       lcd.setCursor(0,1);
       lcd.println("IN WALHALLA!    ");
       delay(3000);
-      
     } else {
       lcd.setCursor(0,0);
-  lcd.println("                          ");
-  lcd.setCursor(0,1);
-  lcd.println("                               ");
-  delay(1000);
+      lcd.println("                          ");
+      lcd.setCursor(0,1);
+      lcd.println("                               ");
+      delay(1000);
     }
-    
 }
