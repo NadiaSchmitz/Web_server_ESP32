@@ -13,7 +13,7 @@
 
 // Wi-Fi
 const char* ssid = "FRITZ!Box 7490";
-const char* password = "13102413714620774693";
+const char* password = "";
 
 
 const char* PARAM_INPUT_1 = "output";
